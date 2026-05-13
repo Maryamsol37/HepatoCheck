@@ -119,15 +119,19 @@ class ResultView(tk.Frame):
         confidence = result.get("confidence", 0)
         recommendation = result.get("recommendation", "No recommendation available.")
 
-        if label == "Low Risk":
+        label_text = str(label).strip()
+        normalized_label = label_text.lower()
+        is_low_risk = "low" in normalized_label and "risk" in normalized_label
+
+        if is_low_risk:
             self.badge.configure(
-                text="Low Risk",
+                text=label_text,
                 bg=COLORS["low_risk_bg"],
                 fg=COLORS["low_risk_text"],
             )
         else:
             self.badge.configure(
-                text="Possible Risk",
+                text=label_text,
                 bg=COLORS["risk_bg"],
                 fg=COLORS["risk_text"],
             )
