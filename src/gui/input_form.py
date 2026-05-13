@@ -1,102 +1,146 @@
 """
-Patient Input Form Page
+Modern Patient Input Form Page
 """
 
 import tkinter as tk
 from tkinter import ttk, messagebox
 
 from src.ml.predict import FEATURE_REQUEST_ORDER
-from src.gui.styles import FONTS, INPUT_WIDTH
+from src.gui.styles import COLORS, FONTS, FIELD_LABELS
 
 
-FIELD_LABELS = {
-    "Age": "Age",
-    "Sex": "Sex",
-    "ALB": "Albumin (ALB)",
-    "ALP": "Alkaline Phosphatase (ALP)",
-    "ALT": "Alanine Aminotransferase (ALT)",
-    "AST": "Aspartate Aminotransferase (AST)",
-    "BIL": "Bilirubin (BIL)",
-    "CHE": "Cholinesterase (CHE)",
-    "CHOL": "Cholesterol (CHOL)",
-    "CREA": "Creatinine (CREA)",
-    "GGT": "Gamma-GT (GGT)",
-    "PROT": "Total Protein (PROT)",
-}
-
-
-class PatientInputForm(ttk.Frame):
+class PatientInputForm(tk.Frame):
     def __init__(self, parent, controller, on_prediction_success):
-        super().__init__(parent)
+        super().__init__(parent, bg=COLORS["bg"])
 
         self.controller = controller
         self.on_prediction_success = on_prediction_success
         self.entries = {}
 
-        self.columnconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
 
-        ttk.Label(
+        tk.Label(
             self,
             text="Single Patient Screening",
-            font=FONTS["title"],
-        ).grid(row=0, column=0, sticky="w", pady=(0, 10))
+            bg=COLORS["bg"],
+            fg=COLORS["text"],
+            font=FONTS["page_title"],
+        ).grid(row=0, column=0, sticky="w", pady=(0, 8))
 
-        ttk.Label(
+        tk.Label(
             self,
-            text="Enter the patient laboratory values below, then run the liver risk prediction.",
-            font=FONTS["subtitle"],
-        ).grid(row=1, column=0, sticky="w", pady=(0, 20))
+            text="Enter the patient’s demographic and laboratory values.",
+            bg=COLORS["bg"],
+            fg=COLORS["muted"],
+            font=FONTS["body"],
+        ).grid(row=1, column=0, sticky="w", pady=(0, 24))
 
-        form_frame = ttk.Frame(self)
-        form_frame.grid(row=2, column=0, sticky="nw")
+        card = tk.Frame(
+            self,
+            bg=COLORS["surface"],
+            padx=28,
+            pady=24,
+            bd=0,
+            highlightthickness=0,
+        )
+        card.grid(row=2, column=0, sticky="ew")
+        card.grid_columnconfigure(1, weight=1)
+        card.grid_columnconfigure(3, weight=1)
 
         for index, feature in enumerate(FEATURE_REQUEST_ORDER):
             row = index // 2
             col = (index % 2) * 2
 
-            ttk.Label(
-                form_frame,
+            tk.Label(
+                card,
                 text=FIELD_LABELS.get(feature, feature),
+                bg=COLORS["surface"],
+                fg=COLORS["text"],
                 font=FONTS["body"],
-            ).grid(row=row, column=col, sticky="w", padx=(0, 8), pady=8)
+            ).grid(row=row, column=col, sticky="w", padx=(0, 10), pady=10)
 
             if feature == "Sex":
                 var = tk.StringVar(value="m")
-                input_widget = ttk.Combobox(
-                    form_frame,
+                widget = ttk.Combobox(
+                    card,
                     textvariable=var,
                     values=["m", "f"],
-                    width=INPUT_WIDTH,
                     state="readonly",
+                    width=24,
                 )
-                input_widget.var = var
+                widget.var = var
             else:
-                input_widget = ttk.Entry(form_frame, width=INPUT_WIDTH)
+                widget = tk.Entry(
+                    card,
+                    width=28,
+                    relief="flat",
+                    bd=0,
+                    bg="#F9FAFB",
+                    fg=COLORS["text"],
+                    font=FONTS["body"],
+                    insertbackground=COLORS["text"],
+                    highlightthickness=1,
+                    highlightbackground=COLORS["border"],
+                    highlightcolor=COLORS["primary"],
+                )
 
-            input_widget.grid(row=row, column=col + 1, sticky="w", padx=(0, 30), pady=8)
-            self.entries[feature] = input_widget
+            widget.grid(row=row, column=col + 1, sticky="ew", padx=(0, 28), pady=10, ipady=8)
+            self.entries[feature] = widget
 
-        button_frame = ttk.Frame(self)
-        button_frame.grid(row=3, column=0, sticky="w", pady=25)
+        button_frame = tk.Frame(self, bg=COLORS["bg"])
+        button_frame.grid(row=3, column=0, sticky="w", pady=24)
 
-        ttk.Button(
+        self.primary_button(
             button_frame,
-            text="Run Prediction",
-            command=self.handle_predict,
-        ).grid(row=0, column=0, padx=(0, 10))
+            "Run Prediction",
+            self.handle_predict,
+        ).pack(side="left", padx=(0, 12))
 
-        ttk.Button(
+        self.secondary_button(
             button_frame,
-            text="Clear Form",
-            command=self.clear_form,
-        ).grid(row=0, column=1)
+            "Fill Sample",
+            self.fill_sample_input,
+        ).pack(side="left", padx=(0, 12))
 
-        self.fill_sample_button = ttk.Button(
+        self.secondary_button(
             button_frame,
-            text="Fill Sample Input",
-            command=self.fill_sample_input,
+            "Clear",
+            self.clear_form,
+        ).pack(side="left")
+
+    def primary_button(self, parent, text, command):
+        return tk.Button(
+            parent,
+            text=text,
+            command=command,
+            bg=COLORS["primary"],
+            fg="white",
+            activebackground=COLORS["primary_hover"],
+            activeforeground="white",
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=10,
+            font=FONTS["button"],
+            cursor="hand2",
         )
-        self.fill_sample_button.grid(row=0, column=2, padx=(10, 0))
+
+    def secondary_button(self, parent, text, command):
+        return tk.Button(
+            parent,
+            text=text,
+            command=command,
+            bg=COLORS["surface"],
+            fg=COLORS["text"],
+            activebackground="#EEF2FF",
+            activeforeground=COLORS["text"],
+            relief="flat",
+            bd=0,
+            padx=18,
+            pady=10,
+            font=FONTS["button"],
+            cursor="hand2",
+        )
 
     def get_form_data(self) -> dict:
         data = {}
