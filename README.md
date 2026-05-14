@@ -102,3 +102,100 @@ Age,Sex,ALB,ALP,ALT,AST,BIL,CHE,CHOL,CREA,GGT,PROT
 
 ## Contributing
 See `docs/contribution_matrix.md` for contribution guidelines.
+
+
+---
+
+# 📦 Model Artifacts
+
+| File | Description |
+|------|------------|
+| trained_model.pkl | Final RandomForest model |
+| scaler.pkl | Feature scaler |
+| feature_names.pkl | Ordered feature list |
+| model_metrics.json | Evaluation metrics |
+| best_pipeline.pkl | Full pipeline (SMOTE + RF) |
+| advanced_metrics.json | Model comparison results |
+| shap_pruned_pipeline.pkl | Reduced feature pipeline |
+
+---
+
+# 🧪 Evaluation Strategy
+
+- Stratified train/test split
+- 5-Fold Cross Validation
+- Nested Cross Validation for tuning
+- ROC-AUC used as main metric
+- Confusion matrix for classification performance
+
+---
+
+# 🔍 Explainability
+
+We used SHAP (SHapley Additive Explanations) to:
+
+- Explain individual predictions
+- Rank feature importance
+- Visualize global model behavior
+
+
+---
+
+# 🚨 Imbalance Handling
+
+Because dataset is highly imbalanced:
+
+- SMOTE applied on training data
+- Class weights used in RandomForest
+- Threshold tuned to 0.2 instead of 0.5
+- Calibration applied for probability stability
+
+---
+
+# 🖥️ GUI System
+
+The system includes:
+
+### Input Form
+- Patient data entry
+- Validation & preprocessing
+
+### Result View
+- Risk label
+- Confidence score
+- Abnormal markers
+- Top contributing features
+
+---
+
+# 📌 Key Outcome
+
+HepatoCheck provides:
+- High accuracy liver disease prediction
+- Interpretable ML decisions
+- Clinically meaningful outputs
+
+---
+
+# 👨‍💻 Technologies Used
+
+- Python
+- Scikit-learn
+- Pandas / NumPy
+- SHAP
+- LightGBM
+- CatBoost
+- Imbalanced-learn (SMOTE)
+- Tkinter (GUI)
+
+---
+
+# 📈 Performance Summary
+
+- Best Model: RandomForest
+- ROC-AUC: 0.9878
+- Calibrated ROC-AUC: 0.9975
+- Stable generalization across folds
+
+---
+
